@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avichal Kumar — Advocate & AI Policy</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0c;
+  --bg2:#111115;
+  --gold:#c9a84c;
+  --gold-light:#e8d48b;
+  --gold-dark:#8a6d2b;
+  --text:#e8e6e1;
+  --text-dim:#8a8880;
+  --text-muted:#5a5850;
+  --accent:#c9a84c;
+  --card:#16161a;
+  --card-border:#2a2a30;
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'DM Sans','Helvetica Neue',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* THREE.JS CANVAS */
+#bg-canvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;
+  pointer-events:none;opacity:0.6;
+}
+
+/* CURSOR GLOW */
+.cursor-glow{
+  position:fixed;width:400px;height:400px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 70%);
+  pointer-events:none;z-index:1;
+  transform:translate(-50%,-50%);
+  transition:transform 0.1s ease-out;
+}
+
+/* SCROLL PROGRESS */
+.scroll-progress{
+  position:fixed;top:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));
+  z-index:1000;transition:width 0.15s;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;width:100%;z-index:100;
+  padding:1.5rem 3rem;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(10,10,12,0);
+  backdrop-filter:blur(0px);
+  transition:all 0.5s ease;
+}
+nav.scrolled{
+  background:rgba(10,10,12,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(201,168,76,0.1);
+}
+.nav-logo{
+  font-family:var(--serif);font-size:1.3rem;font-weight:700;
+  color:var(--gold);letter-spacing:0.05em;
+  text-decoration:none;
+}
+.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links a{
+  color:var(--text-dim);font-size:0.82rem;
+  text-decoration:none;letter-spacing:0.12em;
+  text-transform:uppercase;font-weight:500;
+  transition:color 0.3s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;
+  width:0;height:1px;background:var(--gold);
+  transition:width 0.3s ease;
+}
+.nav-links a:hover{color:var(--gold)}
+.nav-links a:hover::after{width:100%}
+
+/* HAMBURGER */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:200}
+.hamburger span{width:24px;height:1.5px;background:var(--gold);transition:all 0.3s}
+
+/* SECTIONS COMMON */
+section{position:relative;z-index:2;padding:8rem 3rem}
+.section-label{
+  font-family:var(--mono);font-size:0.7rem;
+  color:var(--gold);letter-spacing:0.25em;
+  text-transform:uppercase;margin-bottom:1rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.section-label::before{
+  content:'';width:40px;height:1px;background:var(--gold);
+}
+.section-title{
+  font-family:var(--serif);font-size:clamp(2rem,4vw,3.5rem);
+  font-weight:900;margin-bottom:3rem;line-height:1.15;
+}
+
+/* REVEAL ANIMATIONS */
+.reveal{
+  opacity:0;transform:translateY(60px);
+  transition:opacity 0.8s cubic-bezier(0.16,1,0.3,1),
+             transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.active{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}
+.reveal-delay-2{transition-delay:0.2s}
+.reveal-delay-3{transition-delay:0.3s}
+.reveal-delay-4{transition-delay:0.4s}
+
+/* ============ HERO ============ */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;padding:6rem 3rem 4rem;
+  position:relative;
+}
+.hero-content{max-width:900px;position:relative;z-index:2}
+.hero-overtitle{
+  font-family:var(--mono);font-size:0.75rem;
+  color:var(--gold);letter-spacing:0.3em;
+  text-transform:uppercase;margin-bottom:1.5rem;
+  display:inline-flex;align-items:center;gap:0.8rem;
+}
+.hero-overtitle .line{width:30px;height:1px;background:var(--gold)}
+.hero h1{
+  font-family:var(--serif);
+  font-size:clamp(3rem,7vw,6rem);
+  font-weight:900;line-height:1.05;
+  margin-bottom:1.5rem;
+  background:linear-gradient(135deg,var(--text) 0%,var(--gold-light) 50%,var(--gold) 100%);
+  background-size:200% 200%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 6s ease-in-out infinite;
+}
+@keyframes shimmer{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+.hero-sub{
+  font-size:1.1rem;color:var(--text-dim);
+  max-width:600px;line-height:1.8;margin-bottom:2.5rem;
+}
+.hero-tags{display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:3rem}
+.hero-tag{
+  font-family:var(--mono);font-size:0.7rem;
+  padding:0.4rem 1rem;
+  border:1px solid var(--card-border);
+  border-radius:100px;color:var(--text-dim);
+  transition:all 0.3s;
+}
+.hero-tag:hover{border-color:var(--gold);color:var(--gold)}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  padding:0.9rem 2rem;font-size:0.85rem;
+  font-weight:600;letter-spacing:0.08em;
+  text-transform:uppercase;text-decoration:none;
+  border-radius:4px;transition:all 0.4s ease;
+  cursor:pointer;border:none;font-family:var(--sans);
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--gold-dark),var(--gold));
+  color:var(--bg);
+}
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 40px rgba(201,168,76,0.3);
+}
+.btn-outline{
+  background:transparent;color:var(--gold);
+  border:1px solid var(--gold-dark);
+}
+.btn-outline:hover{
+  background:rgba(201,168,76,0.08);
+  transform:translateY(-2px);
+}
+
+/* FLOATING 3D BADGE */
+.hero-badge{
+  position:absolute;right:6%;top:50%;
+  transform:translateY(-50%);
+  width:280px;height:280px;
+  perspective:800px;
+}
+.badge-inner{
+  width:100%;height:100%;position:relative;
+  transform-style:preserve-3d;
+  animation:float3d 8s ease-in-out infinite;
+}
+@keyframes float3d{
+  0%,100%{transform:rotateY(-10deg) rotateX(5deg) translateY(0)}
+  25%{transform:rotateY(5deg) rotateX(-5deg) translateY(-15px)}
+  50%{transform:rotateY(10deg) rotateX(5deg) translateY(0)}
+  75%{transform:rotateY(-5deg) rotateX(-3deg) translateY(10px)}
+}
+.badge-face{
+  position:absolute;inset:0;
+  border-radius:50%;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:radial-gradient(circle at 30% 30%,#1e1e24,#0e0e12);
+  border:1px solid rgba(201,168,76,0.3);
+  box-shadow:0 0 60px rgba(201,168,76,0.1),
+             inset 0 0 40px rgba(201,168,76,0.05);
+  backface-visibility:hidden;
+}
+.badge-face .icon{
+  font-size:2.5rem;margin-bottom:0.5rem;
+}
+.badge-face .badge-text{
+  font-family:var(--serif);font-size:0.85rem;
+  color:var(--gold);letter-spacing:0.15em;
+  text-transform:uppercase;
+}
+.badge-face .badge-sub{
+  font-size:0.65rem;color:var(--text-muted);
+  margin-top:0.3rem;letter-spacing:0.1em;
+}
+
+/* SCROLLING MARQUEE */
+.marquee-wrap{
+  overflow:hidden;padding:2rem 0;
+  border-top:1px solid var(--card-border);
+  border-bottom:1px solid var(--card-border);
+  position:relative;z-index:2;
+}
+.marquee{
+  display:flex;gap:3rem;
+  animation:marquee 30s linear infinite;
+  width:max-content;
+}
+@keyframes marquee{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+.marquee span{
+  font-family:var(--serif);font-size:1.3rem;
+  color:var(--text-muted);white-space:nowrap;
+  display:flex;align-items:center;gap:3rem;
+}
+.marquee span::after{
+  content:'◆';color:var(--gold-dark);font-size:0.5rem;
+}
+
+/* ============ ABOUT ============ */
+.about-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;
+  align-items:start;max-width:1200px;margin:0 auto;
+}
+.about-text p{
+  color:var(--text-dim);margin-bottom:1.5rem;font-size:0.95rem;
+}
+.stat-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;
+  margin-top:2rem;
+}
+.stat-card{
+  padding:1.5rem;background:var(--card);
+  border:1px solid var(--card-border);border-radius:8px;
+  transition:all 0.4s;position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;
+  width:100%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0;transition:opacity 0.4s;
+}
+.stat-card:hover{
+  border-color:rgba(201,168,76,0.3);
+  transform:translateY(-4px);
+  box-shadow:0 20px 40px rgba(0,0,0,0.3);
+}
+.stat-card:hover::before{opacity:1}
+.stat-number{
+  font-family:var(--serif);font-size:2.2rem;
+  font-weight:900;color:var(--gold);
+}
+.stat-label{
+  font-size:0.75rem;color:var(--text-muted);
+  letter-spacing:0.1em;text-transform:uppercase;
+  margin-top:0.3rem;
+}
+
+/* ENROLLMENTS */
+.enrollment-badges{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap}
+.enrollment-badge{
+  display:flex;align-items:center;gap:0.7rem;
+  padding:0.8rem 1.3rem;
+  background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));
+  border:1px solid rgba(201,168,76,0.2);
+  border-radius:6px;
+}
+.enrollment-badge .eb-icon{font-size:1.2rem}
+.enrollment-badge .eb-text{font-size:0.8rem;color:var(--text-dim);line-height:1.3}
+.enrollment-badge .eb-title{color:var(--gold);font-weight:600;display:block;font-size:0.82rem}
+
+/* ============ EXPERIENCE ============ */
+.timeline{max-width:900px;margin:0 auto;position:relative}
+.timeline::before{
+  content:'';position:absolute;left:20px;top:0;bottom:0;
+  width:1px;background:linear-gradient(to bottom,transparent,var(--gold-dark),var(--gold),var(--gold-dark),transparent);
+}
+.timeline-item{
+  padding-left:60px;padding-bottom:3.5rem;position:relative;
+}
+.timeline-dot{
+  position:absolute;left:13px;top:6px;
+  width:15px;height:15px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--gold);
+  transition:all 0.3s;z-index:2;
+}
+.timeline-item:hover .timeline-dot{
+  background:var(--gold);
+  box-shadow:0 0 20px rgba(201,168,76,0.4);
+}
+.timeline-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:0.5rem}
+.timeline-org{
+  font-family:var(--serif);font-size:1.25rem;font-weight:700;
+  color:var(--text);
+}
+.timeline-meta{
+  font-family:var(--mono);font-size:0.7rem;
+  color:var(--gold);letter-spacing:0.08em;
+}
+.timeline-role{
+  font-size:0.85rem;color:var(--text-dim);margin:0.5rem 0;
+  font-style:italic;
+}
+.timeline-desc{
+  font-size:0.88rem;color:var(--text-muted);line-height:1.7;
+}
+.timeline-desc ul{list-style:none;padding:0}
+.timeline-desc li{
+  padding-left:1.2rem;position:relative;margin-bottom:0.4rem;
+}
+.timeline-desc li::before{
+  content:'›';position:absolute;left:0;color:var(--gold);font-weight:700;
+}
+
+/* ============ PROJECTS ============ */
+.projects-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:2rem;max-width:1200px;margin:0 auto;
+}
+.project-card{
+  background:var(--card);border:1px solid var(--card-border);
+  border-radius:12px;padding:2.5rem;
+  position:relative;overflow:hidden;
+  transition:all 0.5s cubic-bezier(0.16,1,0.3,1);
+  transform-style:preserve-3d;
+  perspective:1000px;
+}
+.project-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));
+  transform:scaleX(0);transform-origin:left;
+  transition:transform 0.5s ease;
+}
+.project-card:hover::before{transform:scaleX(1)}
+.project-card:hover{
+  border-color:rgba(201,168,76,0.3);
+  transform:translateY(-8px);
+  box-shadow:0 30px 60px rgba(0,0,0,0.4),0 0 40px rgba(201,168,76,0.05);
+}
+.project-year{
+  font-family:var(--mono);font-size:0.65rem;
+  color:var(--gold);letter-spacing:0.15em;
+  margin-bottom:1rem;
+}
+.project-name{
+  font-family:var(--serif);font-size:1.35rem;
+  font-weight:700;margin-bottom:0.8rem;line-height:1.3;
+}
+.project-desc{
+  font-size:0.85rem;color:var(--text-muted);line-height:1.7;
+}
+.project-tags{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1.2rem}
+.project-tags span{
+  font-family:var(--mono);font-size:0.6rem;
+  padding:0.25rem 0.7rem;border-radius:100px;
+  background:rgba(201,168,76,0.08);color:var(--gold);
+  border:1px solid rgba(201,168,76,0.15);
+}
+
+/* ============ PUBLICATIONS ============ */
+.pub-list{max-width:900px;margin:0 auto}
+.pub-item{
+  padding:2rem 0;border-bottom:1px solid var(--card-border);
+  display:grid;grid-template-columns:auto 1fr auto;
+  gap:2rem;align-items:center;
+  transition:all 0.3s;
+}
+.pub-item:hover{padding-left:1rem}
+.pub-num{
+  font-family:var(--serif);font-size:2.5rem;
+  font-weight:900;color:rgba(201,168,76,0.15);
+  min-width:60px;
+}
+.pub-item:hover .pub-num{color:var(--gold)}
+.pub-title{
+  font-family:var(--serif);font-size:1.05rem;
+  font-weight:700;line-height:1.4;margin-bottom:0.3rem;
+}
+.pub-venue{
+  font-size:0.78rem;color:var(--text-muted);
+  font-family:var(--mono);letter-spacing:0.05em;
+}
+.pub-year{
+  font-family:var(--mono);font-size:0.75rem;
+  color:var(--gold);letter-spacing:0.1em;
+}
+
+/* ============ SKILLS ============ */
+.skills-container{max-width:1100px;margin:0 auto}
+.skills-category{margin-bottom:3rem}
+.skills-cat-title{
+  font-family:var(--mono);font-size:0.72rem;
+  color:var(--gold);letter-spacing:0.2em;
+  text-transform:uppercase;margin-bottom:1.2rem;
+  padding-bottom:0.5rem;
+  border-bottom:1px solid rgba(201,168,76,0.15);
+}
+.skills-cloud{display:flex;flex-wrap:wrap;gap:0.6rem}
+.skill-chip{
+  padding:0.5rem 1.2rem;border-radius:100px;
+  font-size:0.8rem;color:var(--text-dim);
+  background:var(--card);border:1px solid var(--card-border);
+  transition:all 0.3s;cursor:default;
+}
+.skill-chip:hover{
+  border-color:var(--gold);color:var(--gold);
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* ============ CERTIFICATIONS ============ */
+.cert-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:1.5rem;max-width:1100px;margin:0 auto;
+}
+.cert-card{
+  padding:1.8rem;background:var(--card);
+  border:1px solid var(--card-border);border-radius:10px;
+  transition:all 0.4s;position:relative;overflow:hidden;
+}
+.cert-card::after{
+  content:'';position:absolute;top:-50%;right:-50%;
+  width:100%;height:100%;
+  background:radial-gradient(circle,rgba(201,168,76,0.05),transparent);
+  transition:all 0.5s;
+}
+.cert-card:hover{
+  border-color:rgba(201,168,76,0.3);
+  transform:translateY(-4px);
+}
+.cert-issuer{
+  font-family:var(--mono);font-size:0.65rem;
+  color:var(--gold);letter-spacing:0.15em;
+  text-transform:uppercase;margin-bottom:0.6rem;
+}
+.cert-name{
+  font-family:var(--serif);font-size:1rem;
+  font-weight:700;line-height:1.4;
+}
+.cert-year{
+  font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;
+}
+
+/* ============ EDUCATION ============ */
+.edu-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:2rem;max-width:1100px;margin:0 auto;
+}
+.edu-card{
+  padding:2.5rem 2rem;background:var(--card);
+  border:1px solid var(--card-border);border-radius:12px;
+  position:relative;overflow:hidden;
+  transition:all 0.5s;
+}
+.edu-card::before{
+  content:'';position:absolute;top:0;left:0;
+  width:4px;height:0;background:var(--gold);
+  transition:height 0.5s;
+}
+.edu-card:hover::before{height:100%}
+.edu-card:hover{
+  border-color:rgba(201,168,76,0.2);
+  transform:translateY(-4px);
+}
+.edu-degree{
+  font-family:var(--serif);font-size:1.15rem;
+  font-weight:700;line-height:1.3;margin-bottom:0.6rem;
+}
+.edu-school{
+  font-size:0.85rem;color:var(--text-dim);margin-bottom:0.3rem;
+}
+.edu-year{
+  font-family:var(--mono);font-size:0.7rem;
+  color:var(--gold);letter-spacing:0.1em;
+}
+
+/* ============ CONTACT ============ */
+.contact-section{text-align:center;padding:10rem 3rem}
+.contact-title{
+  font-family:var(--serif);
+  font-size:clamp(2.5rem,5vw,4.5rem);
+  font-weight:900;margin-bottom:1.5rem;
+}
+.contact-sub{
+  color:var(--text-dim);font-size:1rem;
+  max-width:500px;margin:0 auto 3rem;
+}
+.contact-links{
+  display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;
+}
+.contact-link{
+  display:flex;align-items:center;gap:0.6rem;
+  padding:0.8rem 1.5rem;border-radius:6px;
+  border:1px solid var(--card-border);
+  color:var(--text-dim);text-decoration:none;
+  font-size:0.85rem;transition:all 0.3s;
+}
+.contact-link:hover{
+  border-color:var(--gold);color:var(--gold);
+  transform:translateY(-3px);
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+.contact-link svg{width:18px;height:18px;fill:currentColor}
+
+/* FOOTER */
+footer{
+  text-align:center;padding:2rem 3rem;
+  border-top:1px solid var(--card-border);
+  font-size:0.75rem;color:var(--text-muted);
+  position:relative;z-index:2;
+}
+
+/* ============ MOBILE ============ */
+.mobile-menu{
+  display:none;position:fixed;inset:0;
+  background:rgba(10,10,12,0.97);
+  backdrop-filter:blur(30px);
+  z-index:150;flex-direction:column;
+  align-items:center;justify-content:center;gap:2rem;
+  opacity:0;pointer-events:none;transition:opacity 0.4s;
+}
+.mobile-menu.open{display:flex;opacity:1;pointer-events:all}
+.mobile-menu a{
+  font-family:var(--serif);font-size:1.8rem;
+  color:var(--text);text-decoration:none;
+  transition:color 0.3s;
+}
+.mobile-menu a:hover{color:var(--gold)}
+.mobile-close{
+  position:absolute;top:2rem;right:2rem;
+  font-size:2rem;color:var(--gold);cursor:pointer;
+  background:none;border:none;
+}
+
+@media(max-width:1024px){
+  .hero-badge{display:none}
+  .about-grid{grid-template-columns:1fr}
+  .projects-grid{grid-template-columns:1fr}
+  .edu-cards{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  section{padding:5rem 1.5rem}
+  .hero{padding:5rem 1.5rem 3rem}
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  .pub-item{grid-template-columns:1fr;gap:0.5rem}
+  .pub-num{display:none}
+  .stat-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- THREE.JS Background -->
+<canvas id="bg-canvas"></canvas>
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">AK.</a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#experience">Experience</a>
+    <a href="#projects">Projects</a>
+    <a href="#publications">Publications</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="hamburger" id="hamburger" onclick="toggleMobile()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="toggleMobile()">✕</button>
+  <a href="#about" onclick="toggleMobile()">About</a>
+  <a href="#experience" onclick="toggleMobile()">Experience</a>
+  <a href="#projects" onclick="toggleMobile()">Projects</a>
+  <a href="#publications" onclick="toggleMobile()">Publications</a>
+  <a href="#skills" onclick="toggleMobile()">Skills</a>
+  <a href="#contact" onclick="toggleMobile()">Contact</a>
+</div>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero" id="hero">
+  <div class="hero-content">
+    <div class="hero-overtitle reveal">
+      <span class="line"></span> Advocate &bull; AI Policy Researcher &bull; LLM Candidate
+    </div>
+    <h1 class="reveal reveal-delay-1">Avichal<br>Kumar</h1>
+    <p class="hero-sub reveal reveal-delay-2">
+      Advocate enrolled with the Bar Council of Delhi, bridging law and technology — 
+      building AI-powered legal tools, shaping policy discourse, and pursuing insolvency law at NLU Delhi.
+    </p>
+    <div class="hero-tags reveal reveal-delay-3">
+      <span class="hero-tag">AI Policy</span>
+      <span class="hero-tag">Insolvency Law</span>
+      <span class="hero-tag">Legal Tech</span>
+      <span class="hero-tag">Constitutional Law</span>
+      <span class="hero-tag">Cyber Law</span>
+      <span class="hero-tag">Python</span>
+    </div>
+    <div class="hero-cta reveal reveal-delay-4">
+      <a href="#contact" class="btn btn-primary">Get In Touch ↗</a>
+      <a href="#projects" class="btn btn-outline">View Work</a>
+    </div>
+  </div>
+  <div class="hero-badge">
+    <div class="badge-inner">
+      <div class="badge-face">
+        <div class="icon">⚖️</div>
+        <div class="badge-text">Advocate</div>
+        <div class="badge-sub">Bar Council of Delhi</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span>Supreme Court of India</span>
+    <span>NLU Delhi</span>
+    <span>IIT Ropar</span>
+    <span>Bar Council of Delhi</span>
+    <span>Delhi High Court Bar Association</span>
+    <span>LiveLaw</span>
+    <span>LegalBrief Pro</span>
+    <span>AI &amp; Law</span>
+    <span>Supreme Court of India</span>
+    <span>NLU Delhi</span>
+    <span>IIT Ropar</span>
+    <span>Bar Council of Delhi</span>
+    <span>Delhi High Court Bar Association</span>
+    <span>LiveLaw</span>
+    <span>LegalBrief Pro</span>
+    <span>AI &amp; Law</span>
+  </div>
+</div>
+
+<!-- ==================== ABOUT ==================== -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-text">
+      <div class="section-label reveal">About</div>
+      <h2 class="section-title reveal reveal-delay-1">Where Law<br>Meets Technology</h2>
+      <p class="reveal reveal-delay-2">
+        I'm an Advocate enrolled with the Bar Council of Delhi and a member of the Delhi High Court 
+        Bar Association, currently pursuing my PGIP-LLM in Insolvency Laws at National Law University, Delhi.
+      </p>
+      <p class="reveal reveal-delay-3">
+        With a Minor in Artificial Intelligence from IIT Ropar, I bring a rare blend of legal acumen 
+        and technical fluency. I build AI-assisted tools for legal analysis, automate repetitive legal 
+        workflows, and translate complex legal-technical questions into structured, actionable outputs.
+      </p>
+      <p class="reveal reveal-delay-3">
+        My work sits at the intersection of governance design, risk mitigation, institutional capacity, 
+        and evidence-driven AI policy — contributing to both national and global policy discourse through 
+        published research and practical tool-building.
+      </p>
+      <div class="enrollment-badges reveal reveal-delay-4">
+        <div class="enrollment-badge">
+          <span class="eb-icon">⚖️</span>
+          <div class="eb-text">
+            <span class="eb-title">Bar Council of Delhi</span>
+            Enrolled Advocate, 2025
+          </div>
+        </div>
+        <div class="enrollment-badge">
+          <span class="eb-icon">🏛️</span>
+          <div class="eb-text">
+            <span class="eb-title">Delhi High Court Bar Assoc.</span>
+            Member, 2025
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="stat-grid">
+        <div class="stat-card reveal">
+          <div class="stat-number" data-count="55">0</div>
+          <div class="stat-label">Supreme Court Briefs</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-1">
+          <div class="stat-number" data-count="25">0</div>
+          <div class="stat-label">Contracts Reviewed</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-2">
+          <div class="stat-number" data-count="5">0</div>
+          <div class="stat-label">Publications</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-3">
+          <div class="stat-number" data-count="14">0</div>
+          <div class="stat-label">Weeks at Supreme Court</div>
+        </div>
+      </div>
+
+      <!-- EDUCATION -->
+      <div style="margin-top:3rem">
+        <div class="section-label reveal">Education</div>
+        <div class="edu-cards" style="grid-template-columns:1fr;gap:1rem;margin-top:1rem">
+          <div class="edu-card reveal">
+            <div class="edu-degree">PGIP – LLM (Insolvency Laws)</div>
+            <div class="edu-school">National Law University, Delhi</div>
+            <div class="edu-year">2025 – 2027 &bull; Ongoing</div>
+          </div>
+          <div class="edu-card reveal reveal-delay-1">
+            <div class="edu-degree">Minor in Artificial Intelligence</div>
+            <div class="edu-school">Indian Institute of Technology, Ropar</div>
+            <div class="edu-year">2024 – 2025</div>
+          </div>
+          <div class="edu-card reveal reveal-delay-2">
+            <div class="edu-degree">B.A. LL.B. (Hons.)</div>
+            <div class="edu-school">Central University of South Bihar, Gaya</div>
+            <div class="edu-year">2019 – 2024</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== EXPERIENCE ==================== -->
+<section id="experience" style="background:var(--bg2)">
+  <div class="section-label reveal">Experience</div>
+  <h2 class="section-title reveal reveal-delay-1">Professional Journey</h2>
+  <div class="timeline">
+    <div class="timeline-item reveal">
+      <div class="timeline-dot"></div>
+      <div class="timeline-header">
+        <span class="timeline-org">Supreme Court of India</span>
+        <span class="timeline-meta">2024 & 2025 &bull; 14 weeks</span>
+      </div>
+      <div class="timeline-role">Under Hon'ble Mr. Justice Sanjay Karol</div>
+      <div class="timeline-desc">
+        <ul>
+          <li>Prepared analytical briefs for 55+ matters by synthesising pleadings, identifying precise questions of law, and mapping relevant constitutional/statutory provisions and precedents.</li>
+          <li>Researched constitutional principles interpreted and applied in key judgments delivered by His Lordship.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-dot"></div>
+      <div class="timeline-header">
+        <span class="timeline-org">TechLegis Advocates & Solicitors</span>
+        <span class="timeline-meta">2023 &bull; 4 weeks</span>
+      </div>
+      <div class="timeline-desc">
+        <ul>
+          <li>Researched and drafted 30+ regulatory and litigation updates on technology law, cyber regulation, AI privacy, and intellectual property.</li>
+          <li>Focused on regulatory compliance, liability exposure, and contractual risk considerations relevant to corporate operations.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-dot"></div>
+      <div class="timeline-header">
+        <span class="timeline-org">Spice Money</span>
+        <span class="timeline-meta">2023 &bull; 4 weeks</span>
+      </div>
+      <div class="timeline-desc">
+        <ul>
+          <li>Reviewed 25+ Non-Disclosure Agreements and commercial contracts, analysing confidentiality frameworks, liability allocation, and enforceability.</li>
+          <li>Assisted in 5+ compliance reviews relating to fintech regulatory requirements and corporate risk management.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-dot"></div>
+      <div class="timeline-header">
+        <span class="timeline-org">RTI Audit Committee</span>
+        <span class="timeline-meta">2022 &bull; 3 weeks</span>
+      </div>
+      <div class="timeline-role">Govt. of Bihar Commissioned Audit</div>
+      <div class="timeline-desc">
+        <ul>
+          <li>Sole intern in a state-commissioned audit ensuring RTI Act compliance by 20+ public sector authorities in Bihar.</li>
+          <li>Executed by Chanakya National Law University (Panchayati Raj Chair), Patna.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-dot"></div>
+      <div class="timeline-header">
+        <span class="timeline-org">SRB Ojas — Corporate & Commercial</span>
+        <span class="timeline-meta">2022 &bull; 4 weeks</span>
+      </div>
+      <div class="timeline-desc">
+        <ul>
+          <li>Assisted in review and refinement of 10+ commercial agreements and NDAs — structural edits, clause harmonisation, ambiguity identification, and enforceability review.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-dot"></div>
+      <div class="timeline-header">
+        <span class="timeline-org">State Information Commission, Bihar</span>
+        <span class="timeline-meta">2021 & 2022 &bull; 6 weeks</span>
+      </div>
+      <div class="timeline-desc">
+        <ul>
+          <li>Interned under the Bihar State Information Commissioner, observing 50+ RTI appeals and complaint hearings.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-dot"></div>
+      <div class="timeline-header">
+        <span class="timeline-org">Gurugram Police — Cyber Security</span>
+        <span class="timeline-meta">2021 &bull; 4 weeks</span>
+      </div>
+      <div class="timeline-desc">
+        <ul>
+          <li>Participated in training sessions and workshops on cyber security operations and digital crime investigation.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PROJECTS ==================== -->
+<section id="projects">
+  <div class="section-label reveal">Projects</div>
+  <h2 class="section-title reveal reveal-delay-1">Featured Work</h2>
+  <div class="projects-grid">
+    <div class="project-card reveal">
+      <div class="project-year">// 2026</div>
+      <div class="project-name">PGIP — Official Website</div>
+      <div class="project-desc">
+        Led the design and deployment of the official website for the Post Graduate Insolvency 
+        Program at NLU Delhi — integrating institutional branding, structured public information 
+        architecture, and compliance-oriented content delivery.
+      </div>
+      <div class="project-tags">
+        <span>Web Design</span><span>Information Architecture</span><span>NLU Delhi</span>
+      </div>
+    </div>
+    <div class="project-card reveal reveal-delay-1">
+      <div class="project-year">// 2025</div>
+      <div class="project-name">LegalBrief Pro</div>
+      <div class="project-desc">
+        Conceptualized and developed an AI-driven legal tool that converts any judgment or case file 
+        (in any language) into a structured FIRAC case brief — Facts, Issues, Rules, Analysis, Conclusion.
+      </div>
+      <div class="project-tags">
+        <span>AI/LLM</span><span>Legal Tech</span><span>Python</span><span>NLP</span>
+      </div>
+    </div>
+    <div class="project-card reveal reveal-delay-2">
+      <div class="project-year">// 2024</div>
+      <div class="project-name">Documentary: Railway Workers</div>
+      <div class="project-desc">
+        Investigated wage exploitation of railway contractual workers — conducted field research, 
+        mediated salary disbursals with contractors, filed RTIs exposing non-transparent agreements, 
+        and secured widespread media coverage.
+      </div>
+      <div class="project-tags">
+        <span>Documentary</span><span>Field Research</span><span>RTI</span><span>Media</span>
+      </div>
+    </div>
+    <div class="project-card reveal reveal-delay-3">
+      <div class="project-year">// 2023</div>
+      <div class="project-name">Liquor Prohibition Impact Study</div>
+      <div class="project-desc">
+        Analyzed statistical and policy data for a report submitted to the Department of Prohibition, 
+        Excise & Registration, Government of Bihar — assessing the impact of seven years of liquor prohibition.
+      </div>
+      <div class="project-tags">
+        <span>Policy Research</span><span>Data Analysis</span><span>Govt. Report</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PUBLICATIONS ==================== -->
+<section id="publications" style="background:var(--bg2)">
+  <div class="section-label reveal">Publications</div>
+  <h2 class="section-title reveal reveal-delay-1">Published Research</h2>
+  <div class="pub-list">
+    <div class="pub-item reveal">
+      <div class="pub-num">01</div>
+      <div>
+        <div class="pub-title">When Referee Plays The Game: AI, Data Foreclosure, And Limits Of Indian Competition Law</div>
+        <div class="pub-venue">Published in LiveLaw</div>
+      </div>
+      <div class="pub-year">2026</div>
+    </div>
+    <div class="pub-item reveal">
+      <div class="pub-num">02</div>
+      <div>
+        <div class="pub-title">Statutory Immunity and the Doctrine of Good Faith in Corporate Insolvency</div>
+        <div class="pub-venue">Published in IBC Laws</div>
+      </div>
+      <div class="pub-year">2026</div>
+    </div>
+    <div class="pub-item reveal">
+      <div class="pub-num">03</div>
+      <div>
+        <div class="pub-title">IBC 2.0: Has the 2025 Amendment Fixed the Cracks in India's Insolvency Regime?</div>
+        <div class="pub-venue">Published in LiveLaw</div>
+      </div>
+      <div class="pub-year">2025</div>
+    </div>
+    <div class="pub-item reveal">
+      <div class="pub-num">04</div>
+      <div>
+        <div class="pub-title">Algorithms Of Injustice: Unmasking AI Bias and Human Rights Violations in India</div>
+        <div class="pub-venue">Published in Indian Journal of Law and Legal Research (ISSN: 2582-8878)</div>
+      </div>
+      <div class="pub-year">2025</div>
+    </div>
+    <div class="pub-item reveal">
+      <div class="pub-num">05</div>
+      <div>
+        <div class="pub-title">Navigating Data Erasure: Challenges and Prospects for the Right to Be Forgotten in India</div>
+        <div class="pub-venue">Published in Indian Journal of Law and Legal Research (ISSN: 2582-8878)</div>
+      </div>
+      <div class="pub-year">2025</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SKILLS ==================== -->
+<section id="skills">
+  <div class="section-label reveal">Skills</div>
+  <h2 class="section-title reveal reveal-delay-1">Toolkit</h2>
+  <div class="skills-container">
+    <div class="skills-category reveal">
+      <div class="skills-cat-title">Research</div>
+      <div class="skills-cloud">
+        <span class="skill-chip">SCC Online</span>
+        <span class="skill-chip">Manupatra</span>
+        <span class="skill-chip">PubMed</span>
+        <span class="skill-chip">WestLaw</span>
+        <span class="skill-chip">Supreme Court Database</span>
+        <span class="skill-chip">NCLAT Database</span>
+        <span class="skill-chip">Precedent Mapping</span>
+        <span class="skill-chip">Issue-Based Research</span>
+      </div>
+    </div>
+    <div class="skills-category reveal">
+      <div class="skills-cat-title">Drafting & Legal</div>
+      <div class="skills-cloud">
+        <span class="skill-chip">Applications & Petitions</span>
+        <span class="skill-chip">Research Memoranda</span>
+        <span class="skill-chip">Impact Assessment Reports</span>
+        <span class="skill-chip">NDAs & Contracts</span>
+        <span class="skill-chip">Regulatory Updates</span>
+        <span class="skill-chip">FIRAC Structuring</span>
+        <span class="skill-chip">Legal Document Automation</span>
+      </div>
+    </div>
+    <div class="skills-category reveal">
+      <div class="skills-cat-title">Technical</div>
+      <div class="skills-cloud">
+        <span class="skill-chip">Python</span>
+        <span class="skill-chip">HTML</span>
+        <span class="skill-chip">Prompt Engineering</span>
+        <span class="skill-chip">AI/LLMs</span>
+        <span class="skill-chip">AI-Assisted Legal Research</span>
+        <span class="skill-chip">MS Office Suite</span>
+        <span class="skill-chip">Final Cut Pro</span>
+        <span class="skill-chip">Canva</span>
+        <span class="skill-chip">YouTube Studio</span>
+        <span class="skill-chip">Social Media Management</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CERTIFICATIONS ==================== -->
+<section style="background:var(--bg2)">
+  <div class="section-label reveal">Certifications</div>
+  <h2 class="section-title reveal reveal-delay-1">Credentials</h2>
+  <div class="cert-grid">
+    <div class="cert-card reveal">
+      <div class="cert-issuer">TCS iON</div>
+      <div class="cert-name">Career Edge – Young Professional</div>
+      <div class="cert-year">2025</div>
+    </div>
+    <div class="cert-card reveal reveal-delay-1">
+      <div class="cert-issuer">Manupatra Academy</div>
+      <div class="cert-name">Certified Legal Researcher (MCLR)</div>
+      <div class="cert-year">2025</div>
+    </div>
+    <div class="cert-card reveal reveal-delay-2">
+      <div class="cert-issuer">NISM (SEBI)</div>
+      <div class="cert-name">Investor Certificate Examination</div>
+      <div class="cert-year">2025</div>
+    </div>
+    <div class="cert-card reveal reveal-delay-3">
+      <div class="cert-issuer">NISM (SEBI)</div>
+      <div class="cert-name">Online Dispute Resolution</div>
+      <div class="cert-year">2024</div>
+    </div>
+    <div class="cert-card reveal reveal-delay-4">
+      <div class="cert-issuer">UC Irvine (Coursera)</div>
+      <div class="cert-name">Security Governance & Compliance</div>
+      <div class="cert-year">2022</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CONTACT ==================== -->
+<section class="contact-section" id="contact">
+  <div class="section-label reveal" style="justify-content:center">Let's Connect</div>
+  <h2 class="contact-title reveal reveal-delay-1">Get In Touch</h2>
+  <p class="contact-sub reveal reveal-delay-2">
+    Whether it's about AI policy, legal tech, insolvency law, or collaboration — I'd love to hear from you.
+  </p>
+  <div class="contact-links reveal reveal-delay-3">
+    <a href="mailto:avichal.kumar25@nludelhi.ac.in" class="contact-link">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      avichal.kumar25@nludelhi.ac.in
+    </a>
+    <a href="tel:+919263039361" class="contact-link">
+      <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+      +91 9263039361
+    </a>
+    <a href="https://www.linkedin.com/in/avichalkumar29" target="_blank" class="contact-link">
+      <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14m-.5 15.5v-5.3a3.26 3.26 0 00-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 011.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 001.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 00-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+      LinkedIn
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Avichal Kumar — Designed with purpose.</p>
+</footer>
+
+<script>
+// ============ THREE.JS PARTICLE FIELD ============
+(function(){
+  const canvas = document.getElementById('bg-canvas');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.z = 30;
+
+  // Particles
+  const count = 1800;
+  const geo = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+
+  for(let i = 0; i < count; i++){
+    const i3 = i * 3;
+    positions[i3]     = (Math.random() - 0.5) * 80;
+    positions[i3 + 1] = (Math.random() - 0.5) * 80;
+    positions[i3 + 2] = (Math.random() - 0.5) * 80;
+    const gold = Math.random() > 0.7;
+    colors[i3]     = gold ? 0.79 : 0.3;
+    colors[i3 + 1] = gold ? 0.66 : 0.3;
+    colors[i3 + 2] = gold ? 0.3 : 0.35;
+  }
+
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  const mat = new THREE.PointsMaterial({
+    size: 0.08,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.8,
+    sizeAttenuation: true,
+  });
+
+  const particles = new THREE.Points(geo, mat);
+  scene.add(particles);
+
+  // Connecting lines
+  const lineMat = new THREE.LineBasicMaterial({
+    color: 0xc9a84c,
+    transparent: true,
+    opacity: 0.04,
+  });
+  const lineGeo = new THREE.BufferGeometry();
+  const linePositions = [];
+  for(let i = 0; i < count; i++){
+    for(let j = i + 1; j < count; j++){
+      const dx = positions[i*3] - positions[j*3];
+      const dy = positions[i*3+1] - positions[j*3+1];
+      const dz = positions[i*3+2] - positions[j*3+2];
+      const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      if(dist < 4){
+        linePositions.push(positions[i*3], positions[i*3+1], positions[i*3+2]);
+        linePositions.push(positions[j*3], positions[j*3+1], positions[j*3+2]);
+      }
+    }
+  }
+  lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+  const lines = new THREE.LineSegments(lineGeo, lineMat);
+  scene.add(lines);
+
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  function animate(){
+    requestAnimationFrame(animate);
+    particles.rotation.y += 0.0003;
+    particles.rotation.x += 0.0001;
+    lines.rotation.y += 0.0003;
+    lines.rotation.x += 0.0001;
+    camera.position.x += (mouseX * 3 - camera.position.x) * 0.02;
+    camera.position.y += (-mouseY * 3 - camera.position.y) * 0.02;
+    camera.lookAt(scene.position);
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+})();
+
+// ============ CURSOR GLOW ============
+const glow = document.getElementById('cursorGlow');
+document.addEventListener('mousemove', e => {
+  glow.style.left = e.clientX + 'px';
+  glow.style.top = e.clientY + 'px';
+});
+
+// ============ SCROLL PROGRESS ============
+window.addEventListener('scroll', () => {
+  const prog = document.getElementById('scrollProgress');
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  prog.style.width = (window.scrollY / h * 100) + '%';
+});
+
+// ============ NAV SCROLL ============
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 80);
+});
+
+// ============ REVEAL ON SCROLL ============
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting) e.target.classList.add('active');
+  });
+}, {threshold: 0.1, rootMargin: '0px 0px -50px 0px'});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ============ COUNTER ANIMATION ============
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      const el = e.target;
+      const target = parseInt(el.dataset.count);
+      let current = 0;
+      const inc = Math.ceil(target / 40);
+      const timer = setInterval(() => {
+        current += inc;
+        if(current >= target){current = target; clearInterval(timer);}
+        el.textContent = current + '+';
+      }, 30);
+      counterObserver.unobserve(el);
+    }
+  });
+}, {threshold: 0.5});
+document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+// ============ 3D TILT ON PROJECT CARDS ============
+document.querySelectorAll('.project-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = (y - centerY) / centerY * -4;
+    const rotateY = (x - centerX) / centerX * 4;
+    card.style.transform = `translateY(-8px) perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+// ============ MOBILE MENU ============
+function toggleMobile(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+</script>
+</body>
+</html>
